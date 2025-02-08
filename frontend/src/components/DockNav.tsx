@@ -13,6 +13,7 @@ export function DockNav() {
           </div>
           <div className="flex items-center gap-4">
             {/* <WalletButton /> */}
+            <appkit-button />
             <ConnectWalletButton onWalletConnected={() => {}} />
           </div>
         </nav>
