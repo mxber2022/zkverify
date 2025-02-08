@@ -1,0 +1,239 @@
+import React, { useState, useEffect } from 'react';
+import { Gift, Loader2, Sparkles, Trophy, AlertCircle, MessageCircle } from 'lucide-react';
+import { PlatformSelector } from './components/PlatformSelector';
+import { EngagementSelector } from './components/EngagementSelector';
+import { WinnerCard } from './components/WinnerCard';
+import { CommentsList } from './components/CommentsList';
+import { DockNav } from './components/DockNav';
+import { Footer } from './components/Footer';
+import type { Platform, Winner, Comment, EngagementType } from './types';
+
+function App() {
+  const [platform, setPlatform] = useState<Platform>('twitter');
+  const [url, setUrl] = useState('');
+  const [winnerCount, setWinnerCount] = useState(1);
+  const [engagementType, setEngagementType] = useState<EngagementType>('comments');
+  const [winners, setWinners] = useState<Winner[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [touched, setTouched] = useState({ url: false, winnerCount: false });
+
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const isValidWinnerCount = (count: number) => count >= 1 && count <= 100;
+
+  const errors = {
+    url: touched.url && !isValidUrl(url) ? 'Please enter a valid URL' : '',
+    winnerCount: touched.winnerCount && !isValidWinnerCount(winnerCount) ? 'Please enter a number between 1 and 100' : '',
+  };
+
+  useEffect(() => {
+    if (url && isValidUrl(url)) {
+      setLoadingComments(true);
+      // Simulate API call to fetch comments
+      setTimeout(() => {
+        const mockComments: Comment[] = Array.from({ length: 5 }, (_, i) => ({
+          id: `comment-${i}`,
+          username: `user${i + 1}`,
+          profileImage: `https://source.unsplash.com/random/100x100?face=${i}`,
+          content: [
+            "Count me in! 🎉",
+            "This giveaway is amazing! Thanks for the opportunity 🙏",
+            "Been following for a while, would love to win this! 🤞",
+            "Tagged my friends @friend1 @friend2 @friend3",
+            "Upvoted and followed! Good luck everyone 🍀"
+          ][i],
+          timestamp: new Date(Date.now() - i * 3600000).toISOString(),
+          likes: Math.floor(Math.random() * 50) + 1,
+          retweets: Math.floor(Math.random() * 20),
+          replies: Math.floor(Math.random() * 10),
+        }));
+
+        setComments(mockComments);
+        setLoadingComments(false);
+      }, 1000);
+    } else {
+      setComments([]);
+    }
+  }, [url]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTouched({ url: true, winnerCount: true });
+
+    if (errors.url || errors.winnerCount) return;
+
+    setLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      const mockWinners: Winner[] = Array.from({ length: winnerCount }, (_, i) => ({
+        id: `winner-${i}`,
+        platform,
+        username: `winner${i + 1}`,
+        profileImage: `https://source.unsplash.com/random/100x100?winner=${i}`,
+        timestamp: new Date().toISOString(),
+        engagementType,
+      }));
+
+      setWinners(mockWinners);
+      setLoading(false);
+    }, 1500);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-blue-900 via-blue-100 to-blue-900">
+      <div className="absolute inset-0 bg-[url('https://source.unsplash.com/random/1920x1080?abstract')] opacity-10 mix-blend-overlay"></div>
+      <DockNav />
+      <div className="relative flex-grow max-w-4xl mx-auto w-full px-4 py-8 mt-12">
+        <div className="text-center mb-10">
+          <div className="relative">
+            <div className="absolute inset-0 animate-pulse bg-blue-500/20 blur-3xl rounded-full"></div>
+            <div className="relative flex justify-center mb-3">
+              <Gift className="w-16 h-16 text-white drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
+            </div>
+          </div>
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent mb-3 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+            WinWave
+          </h1>
+          <p className="text-gray-800 text-lg font-medium">
+            Pick random winners from Twitter, Farcaster, or Lens Protocol
+          </p>
+        </div>
+
+        <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-[0_0_15px_rgba(59,130,246,0.3)] p-6 mb-6 border border-white/20">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <PlatformSelector selected={platform} onSelect={setPlatform} />
+
+            <div className="space-y-4">
+              <div className="group">
+                <label className="block text-sm font-medium text-gray-800 mb-1.5">
+                  Post URL
+                </label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    onBlur={() => setTouched(prev => ({ ...prev, url: true }))}
+                    placeholder="Enter the post URL"
+                    className={`w-full px-3 py-2.5 rounded-lg bg-white/5 text-gray-800 placeholder:text-gray-500 border focus:outline-none focus:ring-2 transition-all duration-300 ${
+                      errors.url 
+                        ? 'border-red-500/50 focus:ring-red-500/50' 
+                        : 'border-white/10 focus:ring-blue-500/50'
+                    }`}
+                  />
+                  {errors.url && (
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <AlertCircle className="h-4 w-4 text-red-500" />
+                    </div>
+                  )}
+                </div>
+                {errors.url && (
+                  <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1.5 animate-fade-in">
+                    {errors.url}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-800 mb-1.5">
+                  Pick Winners From
+                </label>
+                <EngagementSelector selected={engagementType} onSelect={setEngagementType} />
+              </div>
+
+              <div className="group">
+                <label className="block text-sm font-medium text-gray-800 mb-1.5">
+                  Number of Winners
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={winnerCount}
+                    onChange={(e) => setWinnerCount(parseInt(e.target.value))}
+                    onBlur={() => setTouched(prev => ({ ...prev, winnerCount: true }))}
+                    className={`w-full px-3 py-2.5 rounded-lg bg-white/5 text-gray-800 placeholder:text-gray-500 border focus:outline-none focus:ring-2 transition-all duration-300 ${
+                      errors.winnerCount 
+                        ? 'border-red-500/50 focus:ring-red-500/50' 
+                        : 'border-white/10 focus:ring-blue-500/50'
+                    }`}
+                  />
+                  {errors.winnerCount && (
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <AlertCircle className="h-4 w-4 text-red-500" />
+                    </div>
+                  )}
+                </div>
+                {errors.winnerCount && (
+                  <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1.5 animate-fade-in">
+                    {errors.winnerCount}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-5 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 group relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.3)_50%,transparent_75%)] bg-[length:250%_250%] animate-shimmer"></div>
+                <div className="relative flex items-center justify-center gap-2">
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Picking Winners...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      <span>Pick Winners</span>
+                    </>
+                  )}
+                </div>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {url && isValidUrl(url) && (
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-[0_0_15px_rgba(59,130,246,0.3)] p-6 mb-6 border border-white/20 animate-fade-in">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <MessageCircle className="w-5 h-5" />
+              Comments
+            </h2>
+            <CommentsList comments={comments} loading={loadingComments} />
+          </div>
+        )}
+
+        {winners.length > 0 && (
+          <div className="animate-fade-in">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <Trophy className="w-6 h-6" />
+              Winners
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {winners.map((winner) => (
+                <WinnerCard key={winner.id} winner={winner} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <Footer />
+    </div>
+  );
+}
+
+export default App;
