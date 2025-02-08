@@ -1,4 +1,5 @@
 "use client";
+
 import React, {
   createContext,
   useContext,
@@ -7,11 +8,17 @@ import React, {
   FC,
 } from "react";
 
+export interface Wallet {
+  extensionName: string;
+  title: string;
+  installed: boolean;
+}
+
 interface AccountContextType {
   selectedAccount: string | null;
-  selectedWallet: string | null;
   setSelectedAccount: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedWallet: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedWallet: Wallet | null;
+  setSelectedWallet: React.Dispatch<React.SetStateAction<Wallet | null>>;
 }
 
 export const AccountContext = createContext<AccountContextType | undefined>(
@@ -20,9 +27,9 @@ export const AccountContext = createContext<AccountContextType | undefined>(
 
 export const AccountProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
-  const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
+  const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 
-  console.log("selectedWallet: hehe ", selectedWallet);
+  console.log("selectedWalletsssss: ", selectedWallet?.extensionName);
   return (
     <AccountContext.Provider
       value={{
@@ -39,7 +46,8 @@ export const AccountProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
 export const useAccount = () => {
   const context = useContext(AccountContext);
-  if (!context)
+  if (!context) {
     throw new Error("useAccount must be used within an AccountProvider");
+  }
   return context;
 };
