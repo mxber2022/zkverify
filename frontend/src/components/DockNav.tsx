@@ -1,7 +1,5 @@
-import React from 'react';
-import { Home, Gift, Trophy, Users, Settings } from 'lucide-react';
-import { Link } from './Link';
-import { WalletButton } from './WalletButton';
+import ConnectWalletButton from "./ConnectWalletButton";
+import { ConnectWalletButtonHandle } from "../components/ConnectWalletButton";
 
 export function DockNav() {
   return (
@@ -15,7 +13,8 @@ export function DockNav() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <WalletButton />
+            {/* <WalletButton /> */}
+            <ConnectWalletButton onWalletConnected={() => {}} />
           </div>
         </nav>
       </div>

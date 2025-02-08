@@ -1,23 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { Gift, Loader2, Sparkles, Trophy, AlertCircle, MessageCircle } from 'lucide-react';
-import { PlatformSelector } from './components/PlatformSelector';
-import { EngagementSelector } from './components/EngagementSelector';
-import { WinnerCard } from './components/WinnerCard';
-import { CommentsList } from './components/CommentsList';
-import { DockNav } from './components/DockNav';
-import { Footer } from './components/Footer';
-import type { Platform, Winner, Comment, EngagementType } from './types';
-
+import React, { useState, useEffect } from "react";
+import {
+  Gift,
+  Loader2,
+  Sparkles,
+  Trophy,
+  AlertCircle,
+  MessageCircle,
+} from "lucide-react";
+import { PlatformSelector } from "./components/PlatformSelector";
+import { EngagementSelector } from "./components/EngagementSelector";
+import { WinnerCard } from "./components/WinnerCard";
+import { CommentsList } from "./components/CommentsList";
+import { DockNav } from "./components/DockNav";
+import { Footer } from "./components/Footer";
+import type { Platform, Winner, Comment, EngagementType } from "./types";
+import { useRef } from "react";
+import proofData from "./proofs/risc0_v1_0.json";
+import { useAccount } from "./contexts/AccountContext";
+import { useZkVerify } from "./hooks/useZkVerify";
+import styles from "./page.module.css";
 function App() {
-  const [platform, setPlatform] = useState<Platform>('twitter');
-  const [url, setUrl] = useState('');
+  const [platform, setPlatform] = useState<Platform>("twitter");
+  const [url, setUrl] = useState("");
   const [winnerCount, setWinnerCount] = useState(1);
-  const [engagementType, setEngagementType] = useState<EngagementType>('comments');
+  const [engagementType, setEngagementType] =
+    useState<EngagementType>("comments");
   const [winners, setWinners] = useState<Winner[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingComments, setLoadingComments] = useState(false);
   const [touched, setTouched] = useState({ url: false, winnerCount: false });
+
+  const [loadings, setLoadings] = useState(false);
+  const [verificationResult, setVerificationResult] = useState<string | null>(
+    null
+  );
+  const [blockHash, setBlockHash] = useState<string | null>(null);
+
+  const { selectedAccount, selectedWallet } = useAccount();
+  const { onVerifyProof, status, eventData, transactionResult, error } =
+    useZkVerify();
 
   const isValidUrl = (url: string) => {
     try {
@@ -31,8 +53,11 @@ function App() {
   const isValidWinnerCount = (count: number) => count >= 1 && count <= 100;
 
   const errors = {
-    url: touched.url && !isValidUrl(url) ? 'Please enter a valid URL' : '',
-    winnerCount: touched.winnerCount && !isValidWinnerCount(winnerCount) ? 'Please enter a number between 1 and 100' : '',
+    url: touched.url && !isValidUrl(url) ? "Please enter a valid URL" : "",
+    winnerCount:
+      touched.winnerCount && !isValidWinnerCount(winnerCount)
+        ? "Please enter a number between 1 and 100"
+        : "",
   };
 
   useEffect(() => {
@@ -49,7 +74,7 @@ function App() {
             "This giveaway is amazing! Thanks for the opportunity 🙏",
             "Been following for a while, would love to win this! 🤞",
             "Tagged my friends @friend1 @friend2 @friend3",
-            "Upvoted and followed! Good luck everyone 🍀"
+            "Upvoted and followed! Good luck everyone 🍀",
           ][i],
           timestamp: new Date(Date.now() - i * 3600000).toISOString(),
           likes: Math.floor(Math.random() * 50) + 1,
@@ -68,28 +93,68 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ url: true, winnerCount: true });
-
     if (errors.url || errors.winnerCount) return;
+    setLoading(true);
+
+    if (!selectedAccount || !selectedWallet) {
+      console.log("selectedAccount: ", selectedAccount);
+      console.log("selectedWallet: ", selectedWallet);
+      setVerificationResult("Please connect a wallet and select an account.");
+      return;
+    }
 
     setLoading(true);
+    setVerificationResult(null);
+    setBlockHash(null);
+
+    const { vk, publicSignals, proof } = proofData;
+    console.log("proofData: ", proofData);
+
+    try {
+      await onVerifyProof(proof, publicSignals, vk);
+    } catch (error) {
+      setVerificationResult(`Error: ${(error as Error).message}`);
+    } finally {
+      setLoading(false);
+    }
 
     // Simulate API call
     setTimeout(() => {
-      const mockWinners: Winner[] = Array.from({ length: winnerCount }, (_, i) => ({
-        id: `winner-${i}`,
-        platform,
-        username: `winner${i + 1}`,
-        profileImage: `https://source.unsplash.com/random/100x100?winner=${i}`,
-        timestamp: new Date().toISOString(),
-        engagementType,
-      }));
+      const mockWinners: Winner[] = Array.from(
+        { length: winnerCount },
+        (_, i) => ({
+          id: `winner-${i}`,
+          platform,
+          username: `winner${i + 1}`,
+          profileImage: `https://source.unsplash.com/random/100x100?winner=${i}`,
+          timestamp: new Date().toISOString(),
+          engagementType,
+        })
+      );
 
       setWinners(mockWinners);
       setLoading(false);
     }, 1500);
-
-    
   };
+
+  useEffect(() => {
+    if (error) {
+      setVerificationResult(error);
+    } else if (status === "verified") {
+      setVerificationResult("Proof verified successfully!");
+      if (eventData?.blockHash) {
+        setBlockHash(eventData.blockHash);
+      }
+    } else if (status === "includedInBlock" && eventData) {
+      setVerificationResult("Transaction Included In Block");
+    } else if (status === "cancelled") {
+      setVerificationResult("Transaction Rejected By User.");
+    }
+  }, [error, status, eventData]);
+
+  const blockExplorerUrl = blockHash
+    ? `https://testnet-explorer.zkverify.io/v0/block/${blockHash}`
+    : null;
 
   return (
     <div className="min-h-screen flex flex-col bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-blue-900 via-blue-100 to-blue-900">
@@ -120,17 +185,20 @@ function App() {
                 <label className="block text-sm font-medium text-gray-800 mb-1.5">
                   Post URL
                 </label>
+
                 <div className="relative">
                   <input
                     type="url"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    onBlur={() => setTouched(prev => ({ ...prev, url: true }))}
+                    onBlur={() =>
+                      setTouched((prev) => ({ ...prev, url: true }))
+                    }
                     placeholder="Enter the post URL"
                     className={`w-full px-3 py-2.5 rounded-lg bg-white/5 text-gray-800 placeholder:text-gray-500 border focus:outline-none focus:ring-2 transition-all duration-300 ${
-                      errors.url 
-                        ? 'border-red-500/50 focus:ring-red-500/50' 
-                        : 'border-white/10 focus:ring-blue-500/50'
+                      errors.url
+                        ? "border-red-500/50 focus:ring-red-500/50"
+                        : "border-white/10 focus:ring-blue-500/50"
                     }`}
                   />
                   {errors.url && (
@@ -150,7 +218,10 @@ function App() {
                 <label className="block text-sm font-medium text-gray-800 mb-1.5">
                   Pick Winners From
                 </label>
-                <EngagementSelector selected={engagementType} onSelect={setEngagementType} />
+                <EngagementSelector
+                  selected={engagementType}
+                  onSelect={setEngagementType}
+                />
               </div>
 
               <div className="group">
@@ -164,11 +235,13 @@ function App() {
                     max="100"
                     value={winnerCount}
                     onChange={(e) => setWinnerCount(parseInt(e.target.value))}
-                    onBlur={() => setTouched(prev => ({ ...prev, winnerCount: true }))}
+                    onBlur={() =>
+                      setTouched((prev) => ({ ...prev, winnerCount: true }))
+                    }
                     className={`w-full px-3 py-2.5 rounded-lg bg-white/5 text-gray-800 placeholder:text-gray-500 border focus:outline-none focus:ring-2 transition-all duration-300 ${
-                      errors.winnerCount 
-                        ? 'border-red-500/50 focus:ring-red-500/50' 
-                        : 'border-white/10 focus:ring-blue-500/50'
+                      errors.winnerCount
+                        ? "border-red-500/50 focus:ring-red-500/50"
+                        : "border-white/10 focus:ring-blue-500/50"
                     }`}
                   />
                   {errors.winnerCount && (
@@ -229,6 +302,48 @@ function App() {
                 <WinnerCard key={winner.id} winner={winner} />
               ))}
             </div>
+          </div>
+        )}
+      </div>
+
+      <div className={styles.resultContainer}>
+        {verificationResult && (
+          <p
+            className={
+              verificationResult.includes("failed") ||
+              verificationResult.includes("Error") ||
+              verificationResult.includes("Rejected")
+                ? styles.resultError
+                : styles.resultSuccess
+            }
+          >
+            {verificationResult}
+          </p>
+        )}
+
+        {eventData && status === "includedInBlock" && (
+          <div className={styles.resultSection}>
+            <p>Block Hash: {eventData.blockHash || "N/A"}</p>
+          </div>
+        )}
+
+        {blockExplorerUrl && (
+          <div className={styles.resultLink}>
+            <a
+              href={blockExplorerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Transaction on Explorer
+            </a>
+          </div>
+        )}
+
+        {transactionResult && (
+          <div className={styles.transactionDetails}>
+            <p>Transaction Hash: {transactionResult.txHash || "N/A"}</p>
+            <p>Proof Type: {transactionResult.proofType || "N/A"}</p>
+            <p>Attestation ID: {transactionResult.attestationId || "N/A"}</p>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Heart, MessageCircle, Repeat } from 'lucide-react';
-import type { Comment } from '../types';
+import React from "react";
+import { Heart, MessageCircle, Repeat } from "lucide-react";
+import type { Comment } from "../types";
 
 interface CommentsListProps {
   comments: Comment[];
@@ -42,7 +42,9 @@ export function CommentsList({ comments, loading }: CommentsListProps) {
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium text-gray-800 truncate">@{comment.username}</span>
+                <span className="font-medium text-gray-800 truncate">
+                  @{comment.username}
+                </span>
                 <span className="text-xs text-gray-600">
                   {new Date(comment.timestamp).toLocaleDateString()}
                 </span>
