@@ -16,7 +16,7 @@ import { Footer } from "./components/Footer";
 import type { Platform, Winner, Comment, EngagementType } from "./types";
 import { useRef } from "react";
 import proofData from "./proofs/risc0_v1_0.json";
-import { useAccount } from "./contexts/AccountContext";
+import { useAccountSubstrate } from "./contexts/AccountContext";
 import { useZkVerify } from "./hooks/useZkVerify";
 import styles from "./page.module.css";
 function App() {
@@ -37,7 +37,7 @@ function App() {
   );
   const [blockHash, setBlockHash] = useState<string | null>(null);
 
-  const { selectedAccount, selectedWallet } = useAccount();
+  const { selectedAccount, selectedWallet } = useAccountSubstrate();
   const { onVerifyProof, status, eventData, transactionResult, error } =
     useZkVerify();
 

@@ -1,5 +1,4 @@
 import ConnectWalletButton from "./ConnectWalletButton";
-import { ConnectWalletButtonHandle } from "../components/ConnectWalletButton";
 
 export function DockNav() {
   return (

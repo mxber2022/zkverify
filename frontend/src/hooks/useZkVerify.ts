@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useAccount } from "../contexts/AccountContext";
+import { useAccountSubstrate } from "../contexts/AccountContext";
 
 export function useZkVerify() {
-  const { selectedAccount, selectedWallet } = useAccount();
+  const { selectedAccount, selectedWallet } = useAccountSubstrate();
   const [status, setStatus] = useState<string | null>(null);
   const [eventData, setEventData] = useState<any>(null);
   const [transactionResult, setTransactionResult] = useState<any>(null);

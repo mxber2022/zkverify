@@ -1,5 +1,5 @@
 import React, { useState, useEffect, forwardRef, lazy } from "react";
-import { useAccount } from "../contexts/AccountContext";
+import { useAccountSubstrate } from "../contexts/AccountContext";
 // import styles from "./ConnectWalletButton.module.css";
 
 // Lazy loading the WalletSelect component
@@ -23,7 +23,7 @@ const ConnectWalletButton = forwardRef<
     setSelectedAccount,
     selectedWallet,
     setSelectedWallet,
-  } = useAccount();
+  } = useAccountSubstrate();
   const [isWalletSelectOpen, setIsWalletSelectOpen] = useState(false);
   const [isWalletSelectLoaded, setIsWalletSelectLoaded] = useState(false);
 

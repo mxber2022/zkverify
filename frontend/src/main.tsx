@@ -1,13 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
-import { AccountProvider } from "./contexts/AccountContext";
+import { AccountProviderSubstrate } from "./contexts/AccountContext";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AccountProvider>
+    <AccountProviderSubstrate>
       <App />
-    </AccountProvider>
+    </AccountProviderSubstrate>
   </StrictMode>
 );
