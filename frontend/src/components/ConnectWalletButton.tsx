@@ -57,13 +57,13 @@ const ConnectWalletButton = forwardRef<
 
   return (
     <>
-      <button onClick={handleWalletConnectOpen} className={""}>
+      <button
+        onClick={handleWalletConnectOpen}
+        className="bg-blue-400 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:shadow-outline"
+      >
         {selectedAccount
-          ? `Connected: ${selectedAccount.slice(
-              0,
-              6
-            )}...${selectedAccount.slice(-4)}`
-          : "Connect Wallet"}
+          ? `${selectedAccount.slice(0, 6)}...${selectedAccount.slice(-4)}`
+          : "Connect ZKVerify Wallet"}
       </button>
 
       {isWalletSelectOpen && isWalletSelectLoaded && (
