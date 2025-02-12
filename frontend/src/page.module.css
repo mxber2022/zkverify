@@ -1,28 +1,3 @@
-.page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  padding: 2rem;
-  background-color: var(--background);
-  font-family: Arial, sans-serif;
-}
-
-.main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-  max-width: 800px;
-  min-height: 500px;
-  background-color: #ffffff;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
 .resultContainer {
   min-height: 8rem;
   text-align: center;
@@ -33,13 +8,6 @@
   width: 100%;
 }
 
-.resultSuccess {
-  color: #28a745;
-  font-weight: bold;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-
 .resultSection {
   margin: 0.5rem 0;
   font-size: 1rem;
@@ -48,9 +16,7 @@
 }
 
 .resultLink a {
-  color: #0070f3;
   text-decoration: none;
-  font-weight: bold;
 }
 
 .resultLink a:hover {
@@ -62,24 +28,15 @@
 }
 
 .verifyButton {
-  background-color: #0070f3;
-}
-
-.verifyButton:hover {
-  background-color: #005bb5;
-}
-
-.verifyButton {
   margin-bottom: 1.5rem;
   margin-top: 1.5rem;
   display: block;
 }
 
 .resultSuccess {
-  color: #28a745;
-  font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1rem;
   margin-bottom: 1rem;
+  font-family: "Arial", sans-serif;
 }
 
 .resultError {

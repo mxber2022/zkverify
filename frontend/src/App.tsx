@@ -306,44 +306,44 @@ function App() {
         )}
       </div>
 
-      <div className={styles.resultContainer}>
-        {verificationResult && (
-          <p
-            className={
-              verificationResult.includes("failed") ||
-              verificationResult.includes("Error") ||
-              verificationResult.includes("Rejected")
-                ? styles.resultError
-                : styles.resultSuccess
-            }
-          >
-            {verificationResult}
-          </p>
-        )}
-
+      <div>
         {eventData && status === "includedInBlock" && (
           <div className={styles.resultSection}>
             <p>Block Hash: {eventData.blockHash || "N/A"}</p>
           </div>
         )}
 
-        {blockExplorerUrl && (
-          <div className={styles.resultLink}>
-            <a
-              href={blockExplorerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View Transaction on Explorer
-            </a>
-          </div>
-        )}
-
         {transactionResult && (
           <div className={styles.transactionDetails}>
+            {verificationResult && (
+              <p
+                className={
+                  verificationResult.includes("failed") ||
+                  verificationResult.includes("Error") ||
+                  verificationResult.includes("Rejected")
+                    ? styles.resultError
+                    : styles.resultSuccess
+                }
+              >
+                {verificationResult}
+              </p>
+            )}
+
             <p>Transaction Hash: {transactionResult.txHash || "N/A"}</p>
             <p>Proof Type: {transactionResult.proofType || "N/A"}</p>
             <p>Attestation ID: {transactionResult.attestationId || "N/A"}</p>
+
+            {blockExplorerUrl && (
+              <div className={styles.resultLink}>
+                <a
+                  href={blockExplorerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Transaction on Explorer
+                </a>
+              </div>
+            )}
           </div>
         )}
       </div>
