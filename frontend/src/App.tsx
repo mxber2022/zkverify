@@ -307,11 +307,11 @@ function App() {
       </div>
 
       <div>
-        {eventData && status === "includedInBlock" && (
+        {/* {eventData && status === "includedInBlock" && (
           <div className={styles.resultSection}>
             <p>Block Hash: {eventData.blockHash || "N/A"}</p>
           </div>
-        )}
+        )} */}
 
         {transactionResult && (
           <div className={styles.transactionDetails}>
