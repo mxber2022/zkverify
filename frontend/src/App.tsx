@@ -15,7 +15,8 @@ import { DockNav } from "./components/DockNav";
 import { Footer } from "./components/Footer";
 import type { Platform, Winner, Comment, EngagementType } from "./types";
 import { useRef } from "react";
-import proofData from "./proofs/risc0_v1_0.json";
+//import proofData from "./proofs/risc0_v1_0.json";
+import proofData from "./proofs/myproof.json";
 import { useAccountSubstrate } from "./contexts/AccountContext";
 import { useZkVerify } from "./hooks/useZkVerify";
 import styles from "./page.module.css";
@@ -63,26 +64,70 @@ function App() {
   useEffect(() => {
     if (url && isValidUrl(url)) {
       setLoadingComments(true);
-      // Simulate API call to fetch comments
+      // Simulating API call with real comments data
       setTimeout(() => {
-        const mockComments: Comment[] = Array.from({ length: 5 }, (_, i) => ({
-          id: `comment-${i}`,
-          username: `user${i + 1}`,
-          profileImage: `https://source.unsplash.com/random/100x100?face=${i}`,
-          content: [
-            "Count me in! 🎉",
-            "This giveaway is amazing! Thanks for the opportunity 🙏",
-            "Been following for a while, would love to win this! 🤞",
-            "Tagged my friends @friend1 @friend2 @friend3",
-            "Upvoted and followed! Good luck everyone 🍀",
-          ][i],
-          timestamp: new Date(Date.now() - i * 3600000).toISOString(),
-          likes: Math.floor(Math.random() * 50) + 1,
-          retweets: Math.floor(Math.random() * 20),
-          replies: Math.floor(Math.random() * 10),
-        }));
+        const realComments: Comment[] = [
+          {
+            id: "1",
+            username: "therollupco",
+            profileImage:
+              "https://pbs.twimg.com/profile_images/1813577611680849920/4Dm6Sp8v_400x400.jpg",
+            content:
+              "Excited to see zkVerify making verification faster and more accessible",
+            timestamp: "2024-02-05T12:00:00Z",
+            likes: 0,
+            retweets: 0,
+            replies: 0,
+          },
+          {
+            id: "2",
+            username: "TMehedi30",
+            profileImage:
+              "	https://pbs.twimg.com/profile_images/1611570182438416384/8F_YLjz__400x400.jpg",
+            content:
+              "I used to think ZK proofs were like my cooking skills—complex, slow, and definitely not worth the expense! 😂 But with PublicAI, we're cooking up something tasty! 🍽️",
+            timestamp: "2024-02-05T12:30:00Z",
+            likes: 0,
+            retweets: 0,
+            replies: 0,
+          },
+          {
+            id: "3",
+            username: "Thao19872017",
+            profileImage:
+              "https://pbs.twimg.com/profile_images/1857385334197366784/jciBl5zF_400x400.jpg",
+            content:
+              "I used to think ZK proofs were like my cooking skills—complex, slow, and a bit of a disaster! But with PublicAI, we're flipping the script! 🍳🙌 #PublicAI",
+            timestamp: "2024-02-05T13:00:00Z",
+            likes: 0,
+            retweets: 0,
+            replies: 0,
+          },
+          {
+            id: "4",
+            username: "TRADE_600",
+            profileImage:
+              "https://pbs.twimg.com/profile_images/1838962147642228736/HHWy9x99_400x400.jpg",
+            content: "where guide verify ?",
+            timestamp: "2024-02-05T13:30:00Z",
+            likes: 0,
+            retweets: 0,
+            replies: 0,
+          },
+          {
+            id: "5",
+            username: "Tipsdeck_03",
+            profileImage:
+              "https://pbs.twimg.com/profile_images/1880241767154438144/pg6NvX3v_400x400.jpg",
+            content: "Scam",
+            timestamp: "2024-02-05T14:00:00Z",
+            likes: 0,
+            retweets: 0,
+            replies: 0,
+          },
+        ];
 
-        setComments(mockComments);
+        setComments(realComments);
         setLoadingComments(false);
       }, 1000);
     } else {
@@ -123,10 +168,11 @@ function App() {
       const mockWinners: Winner[] = Array.from(
         { length: winnerCount },
         (_, i) => ({
-          id: `winner-${i}`,
+          id: "TRADE_600",
           platform,
-          username: `winner${i + 1}`,
-          profileImage: `https://source.unsplash.com/random/100x100?winner=${i}`,
+          username: "TRADE_600",
+          profileImage:
+            "https://pbs.twimg.com/profile_images/1838962147642228736/HHWy9x99_400x400.jpg",
           timestamp: new Date().toISOString(),
           engagementType,
         })
@@ -171,8 +217,9 @@ function App() {
           <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent mb-3 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
             WinWave
           </h1>
-          <p className="text-gray-800 text-lg font-medium">
-            Pick random winners from Twitter, Farcaster, or Lens Protocol
+          <p className="text-black text-sm max-w-lg mx-auto">
+            Powered by ZK-Verify, ensuring verifiable randomness and trustless
+            winner selection across Twitter, Farcaster, and Lens Protocol
           </p>
         </div>
 
@@ -307,11 +354,11 @@ function App() {
       </div>
 
       <div>
-        {/* {eventData && status === "includedInBlock" && (
+        {eventData && status === "includedInBlock" && (
           <div className={styles.resultSection}>
             <p>Block Hash: {eventData.blockHash || "N/A"}</p>
           </div>
-        )} */}
+        )}
 
         {transactionResult && (
           <div className={styles.transactionDetails}>

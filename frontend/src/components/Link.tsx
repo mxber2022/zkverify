@@ -1,9 +1,9 @@
-import React from 'react';
-import { DivideIcon as LucideIcon } from 'lucide-react';
+import React from "react";
+import { DivideIcon as LucideIcon } from "lucide-react";
 
 interface LinkProps {
   href: string;
-  icon: LucideIcon;
+  icon: typeof LucideIcon;
   label: string;
 }
 
