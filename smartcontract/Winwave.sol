@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.22;
+
+import {ERC721} from "@openzeppelin/contracts@5.2.0/token/ERC721/ERC721.sol";
+import {Ownable} from "@openzeppelin/contracts@5.2.0/access/Ownable.sol";
 
 interface IZkVerifyAttestation {
 
@@ -19,7 +22,7 @@ interface IZkVerifyAttestation {
         uint256 _index) external returns (bool);
 }
 
-contract Winwave {
+contract Winwave is ERC721, Ownable {
     
     bytes32 public constant PROVING_SYSTEM_ID = keccak256(abi.encodePacked("risc0"));
 
@@ -31,18 +34,21 @@ contract Winwave {
     bytes32 public vkey; // vkey for our circuit
     bytes32 public vhash; // version hash
 
-    constructor(address _zkVerify, bytes32 _vkey, bytes32 _vhash) {
+    uint256 private _nextTokenId;
+    
+    constructor(address _zkVerify, bytes32 _vkey, bytes32 _vhash, address initialOwner)ERC721("winwave", "win") Ownable(initialOwner) {
         zkVerify = _zkVerify;
         vkey = _vkey;
         vhash = _vhash;
     }
 
     function checkHash(
-        bytes memory _hash, //public input
+        bytes memory _hash,
         uint256 _attestationId,
         bytes32[] calldata _merklePath,
         uint256 _leafCount,
-        uint256 _index
+        uint256 _index,
+        address _mint
     ) public {
 
         bytes32 leaf = keccak256(abi.encodePacked(PROVING_SYSTEM_ID, vkey, vhash, keccak256(abi.encodePacked(_hash))));
@@ -54,5 +60,12 @@ contract Winwave {
             _leafCount,
             _index
         ), "Invalid proof");
+
+        safeMint(_mint);
+    }
+
+    function safeMint(address to) public onlyOwner {
+        uint256 tokenId = _nextTokenId++;
+        _safeMint(to, tokenId);
     }
 }
