@@ -12,6 +12,7 @@ import { Winner, EngagementType } from "../types";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { Contract, ethers } from "ethers";
 import { BrowserProvider } from "ethers";
+import toast from "react-hot-toast";
 
 const engagementIcons: Record<EngagementType, typeof Heart> = {
   comments: MessageCircle,
@@ -83,7 +84,7 @@ export function WinnerCard({ winner }: { winner: Winner }) {
       // Wait for transaction to be mined
       const receipt = await tx.wait();
 
-      alert(`NFT minted successfully!`);
+      toast.success("NFT minted successfully!");
     } catch (error) {
       console.error("Error minting NFT:", error);
       alert("Failed to mint NFT. Please try again.");
