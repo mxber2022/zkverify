@@ -4,6 +4,10 @@
 
 WinWave is a decentralized application powered by ZK-Verify that ensures fair and transparent winner selection using ZK risk0 for social media giveaways across Twitter, Farcaster, and Lens Protocol.
 
+## Contract deployment address
+
+Arbitrum Sepolia: 0x84239B1fDB29d493CAd65BecC55caCcfb8F144B4
+
 ## 🌟 Features
 
 - **Trustless Winner Selection**: Leveraging zero-knowledge proofs for verifiable randomness
