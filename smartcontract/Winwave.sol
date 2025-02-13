@@ -38,7 +38,7 @@ contract Winwave {
     }
 
     function checkHash(
-        bytes memory _hash,
+        bytes memory _hash, //public input
         uint256 _attestationId,
         bytes32[] calldata _merklePath,
         uint256 _leafCount,
