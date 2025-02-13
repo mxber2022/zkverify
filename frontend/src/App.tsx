@@ -135,12 +135,17 @@ function App() {
     }
   }, [url]);
 
+  function delay(ms: any) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ url: true, winnerCount: true });
     if (errors.url || errors.winnerCount) return;
     setLoading(true);
 
+    await delay(10000);
     if (!selectedAccount || !selectedWallet) {
       console.log("selectedAccount: ", selectedAccount);
       console.log("selectedWallet: ", selectedWallet);

@@ -197,8 +197,10 @@ let env = builder.build().unwrap();
 use methods::{HASHER_GUEST_ELF, HASHER_GUEST_ID};
 use risc0_zkvm::{default_prover, ExecutorEnv};
 use serde::Serialize;
+use serde::Deserialize;
 use std::fs::File;
 use std::io::Write;
+use std::fs;
 
 #[derive(Serialize)]
 struct ProofOutput {
@@ -206,6 +208,14 @@ struct ProofOutput {
     publicSignals: String,
     receipt: serde_json::Value,
 }
+
+#[derive(Serialize, Deserialize)]
+struct ProofOutputMine {
+    pub proof: String,
+    pub pub_inputs: String,
+    pub image_id: String,
+}
+
 
 #[derive(Serialize)]
 struct Input {
@@ -253,33 +263,43 @@ fn main() {
         .expect("Failed to prove execution");
     let receipt = prove_info.receipt;
 
-    // Get publicSignals (journal bytes)
-    let receipt_journal_bytes = receipt.journal.bytes.as_slice();
-    let public_signals = hex::encode(receipt_journal_bytes);
 
-    // Get vk (Image ID)
-    let vk = hex::encode(
-        HASHER_GUEST_ID
-            .iter()
-            .flat_map(|word| word.to_le_bytes())
-            .collect::<Vec<_>>(),
-    );
 
-    // Serialize the proof to JSON
-    let json_receipt = serde_json::to_value(&receipt).unwrap();
-    let proof_output = ProofOutput {
-        vk,
-        publicSignals: public_signals,
-        receipt: json_receipt,
-    };
 
-    let json_proof = serde_json::to_string_pretty(&proof_output).unwrap();
-    let mut file = File::create("proof.json").unwrap();
-    file.write_all(json_proof.as_bytes()).unwrap();
-    
-    println!("Serialized receipt saved to 'proof.json'");
+    /*
+        Mine starts
+    */
+        let mut bin_receipt = Vec::new();
+        ciborium::into_writer(&receipt, &mut bin_receipt).unwrap();
+        let proof = hex::encode(&bin_receipt);
+        fs::write("myproof.txt", hex::encode(&bin_receipt)).unwrap();
 
-    // Decode and display public information
+        let receipt_journal_bytes_array = &receipt.journal.bytes.as_slice();
+        let pub_inputs = hex::encode(&receipt_journal_bytes_array);
+
+        // let image_id_hex = hex::encode(
+        //     HASHER_GUEST_ID.into_iter().flat_map(|v| v.to_le_bytes().into_iter).collect::<Vec<_>>(),
+        // );
+
+        let image_id_hex = hex::encode(
+                HASHER_GUEST_ID
+                    .iter()
+                    .flat_map(|word| word.to_le_bytes())
+                    .collect::<Vec<_>>(),
+            );
+
+        let my_proof_output = ProofOutputMine{
+            image_id:"0x".to_owned()+&image_id_hex,
+            pub_inputs:"0x".to_owned()+&pub_inputs,
+            proof:"0x".to_owned()+&proof,
+        };
+
+        let my_proof_output_json = serde_json::to_string(&my_proof_output).unwrap();
+        fs::write("myproof.json", my_proof_output_json).unwrap();
+
+
+
+         // Decode and display public information
     let (journal_n, journal_random_num): (u64, u64) = receipt
         .journal
         .decode()
@@ -292,4 +312,48 @@ fn main() {
         .verify(HASHER_GUEST_ID)
         .expect("Receipt verification failed");
     println!("Receipt verified successfully!");
+
+    /*
+        Mine Ends
+    */
+
+    // // Get publicSignals (journal bytes)
+    // let receipt_journal_bytes = receipt.journal.bytes.as_slice();
+    // let public_signals = hex::encode(receipt_journal_bytes);
+
+    // // Get vk (Image ID)
+    // let vk = hex::encode(
+    //     HASHER_GUEST_ID
+    //         .iter()
+    //         .flat_map(|word| word.to_le_bytes())
+    //         .collect::<Vec<_>>(),
+    // );
+
+    // // Serialize the proof to JSON
+    // let json_receipt = serde_json::to_value(&receipt).unwrap();
+    // let proof_output = ProofOutput {
+    //     vk,
+    //     publicSignals: public_signals,
+    //     receipt: json_receipt,
+    // };
+
+    // let json_proof = serde_json::to_string_pretty(&proof_output).unwrap();
+    // let mut file = File::create("proof.json").unwrap();
+    // file.write_all(json_proof.as_bytes()).unwrap();
+    
+    // println!("Serialized receipt saved to 'proof.json'");
+
+    // // Decode and display public information
+    // let (journal_n, journal_random_num): (u64, u64) = receipt
+    //     .journal
+    //     .decode()
+    //     .expect("Failed to decode (n, random_num) from journal");
+
+    // println!("Random number between 0..{}: {}", journal_n, journal_random_num);
+
+    // // Verify receipt cryptographically using Image ID
+    // receipt
+    //     .verify(HASHER_GUEST_ID)
+    //     .expect("Receipt verification failed");
+    // println!("Receipt verified successfully!");
 }

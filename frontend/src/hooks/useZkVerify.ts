@@ -43,9 +43,11 @@ export function useZkVerify() {
             proof: proofData,
             publicSignals: publicSignals,
             vk: vk,
-            version: "V1_0",
+            version: "V1_2",
           },
         });
+
+      console.log("transactionResult: ", transactionResult);
 
       events.on("includedInBlock", (data: any) => {
         setStatus("includedInBlock");
