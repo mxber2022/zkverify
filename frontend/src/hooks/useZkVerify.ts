@@ -8,6 +8,10 @@ export function useZkVerify() {
   const [transactionResult, setTransactionResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
+  function delay(ms: any) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const onVerifyProof = async (
     proof: string,
     publicSignals: any,
@@ -67,7 +71,29 @@ export function useZkVerify() {
         throw new Error(`Transaction failed: ${(error as Error).message}`);
       }
 
-      if (transactionInfo && transactionInfo.attestationId) {
+      if (
+        transactionInfo &&
+        transactionInfo.attestationId &&
+        transactionInfo.leafDigest
+      ) {
+        await delay(70000);
+        let proof, numberOfLeaves, leafIndex;
+        try {
+          const proofDetails = await session.poe(
+            transactionInfo.attestationId,
+            transactionInfo.leafDigest
+          );
+          ({ proof: proof, numberOfLeaves, leafIndex } = await proofDetails);
+
+          console.log("proofDetails: ", proofDetails);
+          console.log(`Merkle proof details`);
+          console.log(`\tmerkleProof: ${proof}`);
+          console.log(`\tnumberOfLeaves: ${numberOfLeaves}`);
+          console.log(`\tleafIndex: ${leafIndex}`);
+        } catch (error) {
+          console.error("RPC failed:", error);
+        }
+
         setStatus("verified");
       } else {
         throw new Error("Your proof isn't correct.");
